@@ -4,7 +4,6 @@
 
 #define CAN_MSG_ID (0x222)
 #define LED_PIN  (LED_BUILTIN)
-// Note: LED_BUILTIN is used in SPI., can't be used., 
 
 unsigned long previousMillis = 0;
 const unsigned long heartbeat_interval = 5000;
