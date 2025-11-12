@@ -170,23 +170,66 @@ offMsg = [ord('O'), ord('F'), ord('F')]
 
 msg1  = 0x111;
 msg2  = 0x222;
+msg3  = 0x333;
+msg4  = 0x444;
+
 
 messages = [msg1, msg2]
 msgdata  = [onMsg, offMsg]
 
 
+led_color = [
+             [0  ,   0,  50], #    "blue"  : 
+             [0  ,  50,   0], #    "green" : 
+             [50 ,   0,   0], #    "red"   :
+             [50 ,  50,   0], #    "yellow":
+             [0  ,  50,  50], #    "cyan"  :
+             [50 ,   0,  50], #    "magenta":
+             [50 ,  50,  50], #    "white" :
+             [0  ,   0,   0], #    "off"   :
+            ]
+
+msg_count = 0;
+
 if __name__ == "__main__":
     can = RP2350_CAN(rate_kbps = "500KBPS")
+    color = 0
+    
     while True:
         for msg in messages:
             for data in msgdata:
-                print("Sending msg : ", hex(msg), " data: ", [hex(d) for d in data]);
+                print("Sending msg : ", hex(msg), " data: ", [chr(d) for d in data]);
                 can.send(msg, data)
+                msg_count += 1;
                 recv_data = can.recv(msg)
                 if recv_data != None:
                     print(hex(msg) , "recv (H):", [hex(i) for i in recv_data])
             
-                time.sleep(2);
+                time.sleep(0.5);
         
-        time.sleep(5)
+        time.sleep(0.5)
+            
+        print("Sending RGB LED Msg : ", hex(msg3), " data: ", [hex(d) for d in led_color[color]]);
+        can.send(msg3, led_color[color])
+        msg_count += 1;
+        recv_data = can.recv(msg3)
+        if recv_data != None:
+            print(hex(msg) , "RGB LED Recv(H):", [hex(i) for i in recv_data])
+        
+        # pick color for the next iteration.,
+        color = color + 1;
+        if (color >= len(led_color)):
+            color = 0
+        time.sleep(0.5);
 
+        # Reset count if it exceed one byte., 
+        if (msg_count > 255):
+            msg_count = 0
+
+        data = [msg_count];
+        print(f"Count = {int(msg_count)}");
+        can.send(msg4, data)
+        msg_count += 1;
+        recv_data = can.recv(msg4)
+        if recv_data != None:
+            print(hex(msg) , "Msg Count Recv(H):", [hex(i) for i in recv_data])
