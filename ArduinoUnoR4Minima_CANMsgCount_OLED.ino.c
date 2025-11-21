@@ -2,8 +2,7 @@
   CAN Read Write test for Ardunio R4 Mininma
 
   Receive and read CAN Bus messages., 
-  Send count back after a second., 
-
+  Extract the count and show it on OLED display
 */
 /*
   Note:
